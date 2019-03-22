@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Collections;
+using System.Net;
 
 namespace CloudNineDesktop
 {
@@ -38,6 +39,11 @@ namespace CloudNineDesktop
                 DateTime created = fi.CreationTime;
                 DateTime lastmodified = fi.LastWriteTime;
 
+                using (WebClient client = new WebClient())
+                {
+                    client.UploadFile("http://192.168.1.120:8080/cloudnine/FileUpload", fi.ToString());
+                }
+
                 if (File.Exists(Path.Combine(target.FullName, fi.Name)))
                 {
                     string tFileName = Path.Combine(target.FullName, fi.Name);
@@ -50,7 +56,7 @@ namespace CloudNineDesktop
                         if (lastmodified > lm)
                         {
                             Console.WriteLine(@"Source file {0}\{1} last modified {2} is newer than the target file {3}\{4} last modified {5}",
-                                fi.DirectoryName, fi.Name, lastmodified.ToString(), target.FullName, fi.Name, lm.ToString());
+                            fi.DirectoryName, fi.Name, lastmodified.ToString(), target.FullName, fi.Name, lm.ToString());
                             fi.CopyTo(Path.Combine(target.FullName, fi.Name), true);
                         }
                         else
