@@ -12,7 +12,7 @@ namespace CloudNineDesktop
             string sourceDirectory = @"C:\Users\mahar\Desktop\test";
             string targetDirectory = @"C:\Users\mahar\Desktop\copy\test";
             Copy(sourceDirectory, targetDirectory);
-            Copy(targetDirectory, sourceDirectory);
+            //Copy(targetDirectory, sourceDirectory);
             Console.WriteLine();
             Console.WriteLine("Task Completed. Press any key to continue");
             Console.ReadLine();
@@ -39,11 +39,6 @@ namespace CloudNineDesktop
                 DateTime created = fi.CreationTime;
                 DateTime lastmodified = fi.LastWriteTime;
 
-                using (WebClient client = new WebClient())
-                {
-                    client.UploadFile("http://192.168.1.120:8080/cloudnine/FileUpload", fi.ToString());
-                }
-
                 if (File.Exists(Path.Combine(target.FullName, fi.Name)))
                 {
                     string tFileName = Path.Combine(target.FullName, fi.Name);
@@ -58,6 +53,13 @@ namespace CloudNineDesktop
                             Console.WriteLine(@"Source file {0}\{1} last modified {2} is newer than the target file {3}\{4} last modified {5}",
                             fi.DirectoryName, fi.Name, lastmodified.ToString(), target.FullName, fi.Name, lm.ToString());
                             fi.CopyTo(Path.Combine(target.FullName, fi.Name), true);
+
+                            using (WebClient client = new WebClient())
+                            {
+                                Uri siteUri = new Uri("http://192.168.1.24:8080/cloudnine/FileUpload");
+                                byte[] rawResponse = client.UploadFile(siteUri, Path.Combine(target.FullName, fi.Name));
+                                Console.WriteLine("Remote Response: {0}", System.Text.Encoding.ASCII.GetString(rawResponse));
+                            }
                         }
                         else
                         {
